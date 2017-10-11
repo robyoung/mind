@@ -1,0 +1,24 @@
+version: "3.1"
+services:
+  web:
+    build:
+      context: .
+    command: make dev
+    ports:
+      - "8061:8000"
+    links:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=mind
+      - DB_PASSWORD=mind
+      - DB_DATABASE=mind
+      - FLASK_APP=application.py
+    volumes:
+      - ./:/usr/src/app
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_USER=mind
+      - POSTGRES_PASSWORD=mind
+      - POSTGRES_DB=mind
