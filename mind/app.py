@@ -32,6 +32,7 @@ def get_config(environment):
         "DB_USER": os.environ.get("DB_USER", "mind"),
         "DB_PASSWORD": os.environ.get("DB_PASSWORD", "mind"),
         "DB_DATABASE": os.environ.get("DB_DATABASE", "mind"),
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     }
     config["SQLALCHEMY_DATABASE_URI"] = _sqlalchemy_uri(
         "postgresql",
