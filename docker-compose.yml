@@ -3,6 +3,8 @@ services:
   web:
     build:
       context: .
+      args:
+        PYTHON_REQUIREMENTS: ./requirements/development.txt
     command: make dev
     ports:
       - "8061:8000"

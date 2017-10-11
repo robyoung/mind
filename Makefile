@@ -4,3 +4,6 @@ dev: migrate
 
 migrate:
 	flask db upgrade
+
+lint:
+	flake8 --exclude ./migrations
