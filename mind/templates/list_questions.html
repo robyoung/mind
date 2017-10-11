@@ -1,5 +1,10 @@
 <ul>
   {% for question in questions %}
-  <li>{{ question.title }}</li>
+  <li><a href="{{ url_for(".show_question", question_id=question.id) }}">{{ question.title }}</a></li>
   {% endfor %}
 </ul>
+<form method=post action=/question>
+  {% include "forms/question.html" %}
+
+  <input type="submit">
+</form>

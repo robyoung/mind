@@ -1,0 +1,6 @@
+<div>
+  {% for n in range(1, 6) %}
+  <input type=radio id="answer_{{ n }}" name=answer value="{{ n }}">
+  <label for="answer_{{ n }}">{{ n }}</label>
+  {% endfor %}
+</div>

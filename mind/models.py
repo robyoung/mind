@@ -10,7 +10,7 @@ class Question(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow
     )
 
-    answers = db.relationship("Answer", order_by="Answer.created_at")
+    answers = db.relationship("Answer", order_by="desc(Answer.created_at)")
 
     def __repr__(self):
         return "<Question: {}>".format(self.title)
