@@ -16,6 +16,7 @@ services:
       - DB_PASSWORD=mind
       - DB_DATABASE=mind
       - FLASK_APP=application.py
+      - FLASK_DEBUG=1
     volumes:
       - ./:/usr/src/app
   db:
