@@ -53,4 +53,4 @@ def question(flask_app):
         question = Question(title='Test question')
         db.session.add(question)
         db.session.commit()
-        yield question
+    yield question
