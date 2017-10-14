@@ -7,3 +7,6 @@ migrate:
 
 lint:
 	flake8 --exclude ./migrations
+
+test: lint
+	pytest -vs tests
