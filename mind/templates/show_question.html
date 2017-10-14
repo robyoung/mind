@@ -3,7 +3,7 @@
 {% block main %}
 <h1>{{ question.title }}</h1>
 
-<form id=answer-form method=post action="{{ url_for(".add_answer", question_slug=question.slug) }}">
+<form id=answer-form method=post action="{{ url_for(".add_answer", question=question) }}">
   <input type=hidden name=answer value="">
 </form>
 {% for n in range(1, 6) %}
