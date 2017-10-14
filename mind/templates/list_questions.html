@@ -1,3 +1,6 @@
+{% extends "_base.html" %}
+
+{% block main %}
 <ul>
   {% for question in questions %}
   <li><a href="{{ url_for(".show_question", question_id=question.id) }}">{{ question.title }}</a></li>
@@ -8,3 +11,4 @@
 
   <input type="submit">
 </form>
+{% endblock %}

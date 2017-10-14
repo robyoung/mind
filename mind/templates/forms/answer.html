@@ -1,6 +1,5 @@
-<div>
+<div class="answers">
   {% for n in range(1, 6) %}
-  <input type=radio id="answer_{{ n }}" name=answer value="{{ n }}">
-  <label for="answer_{{ n }}">{{ n }}</label>
+  <a class="btn-floating btn-large waves-effect waves-light red">{{ n }}</a>
   {% endfor %}
 </div>

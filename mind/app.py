@@ -24,7 +24,7 @@ def create_app(environment):
 
 def get_config(environment):
     environment = environment.lower()
-    assert environment in ["dev", "prod"]
+    assert environment in ["dev", "test", "prod"]
 
     config = {
         "ENVIRONMENT": environment,
@@ -34,6 +34,10 @@ def get_config(environment):
         "DB_DATABASE": os.environ.get("DB_DATABASE", "mind"),
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
     }
+
+    if environment == "test":
+        config['DB_DATABASE'] = 'test_mind'
+
     config["SQLALCHEMY_DATABASE_URI"] = _sqlalchemy_uri(
         "postgresql",
         config["DB_USER"], config["DB_PASSWORD"],
