@@ -16,8 +16,10 @@ def create_app(environment):
     db.init_app(app)
     app.migrate = Migrate(app, db)
 
-    from .main.blueprint import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    from .blueprints.mind import mind as mind_blueprint
+    app.register_blueprint(mind_blueprint, url_prefix='/mind')
+
+    app.add_url_rule('/', view_func=lambda: 'OK')
 
     return app
 
