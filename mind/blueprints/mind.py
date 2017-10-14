@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, redirect, url_for, request,
-    abort, flash
+    abort, flash, send_from_directory
 )
 
 from mind.models import Question, Answer
@@ -15,6 +15,11 @@ def index():
     question_url = url_for('.show_question',
                            question=question_slug)
     return redirect(question_url), 301
+
+
+@mind.route('/static/<path:path>')
+def static(path):
+    return send_from_directory('static', path)
 
 
 @mind.route('/question', methods=['GET'])

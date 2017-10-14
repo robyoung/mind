@@ -10,4 +10,10 @@ def test_mind_index(test_client):
     response = test_client.get('/mind')
 
     assert response.status_code == 301
-    assert response.location.endswith('/mind/question/how-are-you-feeling')
+    assert response.location.endswith('/mind/question/how-are-you-today')
+
+
+def test_mind_static(test_client):
+    response = test_client.get('/mind/static/js/init.js')
+
+    assert response.status_code == 200
