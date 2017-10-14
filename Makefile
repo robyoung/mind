@@ -1,5 +1,3 @@
-SHELL := /bin/bash
-
 COMMIT=$(shell git rev-parse --short HEAD)
 
 .PHONY: run
