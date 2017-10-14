@@ -28,6 +28,7 @@ def get_config(environment):
 
     config = {
         "ENVIRONMENT": environment,
+        "SECRET_KEY": os.environ.get("SECRET_KEY", "a big bad secret"),
         "DB_HOST": os.environ.get("DB_HOST", "db"),
         "DB_USER": os.environ.get("DB_USER", "mind"),
         "DB_PASSWORD": os.environ.get("DB_PASSWORD", "mind"),

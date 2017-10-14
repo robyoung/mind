@@ -1,4 +1,7 @@
-from flask import Blueprint, render_template, redirect, url_for, request, abort
+from flask import (
+    Blueprint, render_template, redirect, url_for, request,
+    abort, flash
+)
 
 from mind.models import Question, Answer
 from mind.app import db
@@ -42,6 +45,7 @@ def add_answer(question):
     db.session.add(answer)
     db.session.commit()
 
+    flash('Answer added')
     return redirect(url_for(".show_question", question=question))
 
 

@@ -36,3 +36,13 @@ def test_answer_question(flask_app, question):
     with flask_app.app_context():
         question = Question.query.get(question.id)
         assert len(question.answers) == 1
+
+
+def test_answer_adds_flash_message(test_client, question):
+    test_client.post(
+        '/question/test-question/answer',
+        data={'answer': '1'})
+    response = test_client.get('/question/test-question')
+
+    assert response.status_code == 200
+    assert 'Answer added' in response.get_data(as_text=True)
