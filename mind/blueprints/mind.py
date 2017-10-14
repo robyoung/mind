@@ -11,7 +11,7 @@ mind = Blueprint('mind', __name__)
 
 @mind.route('')
 def index():
-    question_slug = 'how-are-you-feeling'
+    question_slug = 'how-are-you-today'
     question_url = url_for('.show_question',
                            question=question_slug)
     return redirect(question_url), 301
