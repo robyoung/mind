@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--config", "gunicorn.conf", "-b", ":8000", "application:app"]
+CMD ["make", "run"]
