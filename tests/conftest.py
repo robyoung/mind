@@ -43,8 +43,8 @@ def flask_app(test_db):
 
 @pytest.fixture
 def test_client(flask_app):
-    client = flask_app.test_client()
-    yield client
+    with flask_app.test_client() as client:
+        yield client
 
 
 @pytest.fixture

@@ -1,10 +1,10 @@
 from flask import (
     Blueprint, render_template, redirect, url_for, request,
-    abort, flash, send_from_directory
+    abort, flash, send_from_directory, session
 )
 
 from mind.models import Question, Answer
-from mind.app import db
+from mind.app import db, google
 
 mind = Blueprint('mind', __name__)
 
@@ -15,6 +15,42 @@ def index():
     question_url = url_for('.show_question',
                            question=question_slug)
     return redirect(question_url), 301
+
+
+@mind.route('/login')
+def login():
+    callback = url_for('.authorized', _external=True, _scheme='https')
+    return google.authorize(callback=callback)
+
+
+@mind.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('Logged out')
+    return redirect(url_for('.index'))
+
+
+@mind.route('/oauth2-callback')
+def authorized():
+    resp = google.authorized_response()
+    if resp is None:
+        return ('Access denied: ' +
+                'reason={error_reason[0]} ' +
+                'error={error_description[0]}').format(**request.args), 401
+
+    session['user'] = dict(google_token=(resp['access_token'], ''))
+    me = google.get('userinfo')
+    session['user'] = dict(session['user'],
+                           email=me.data['email'],
+                           given_name=me.data['given_name'])
+    session.permanent = True
+
+    return redirect(url_for('.index')), 302
+
+
+@google.tokengetter
+def get_google_oauth_token():
+    return session.get('user', {}).get('google_token')
 
 
 @mind.route('/static/<path:path>')
@@ -46,7 +82,6 @@ def show_question(question):
 
 @mind.route('/question/<question>/answer', methods=['POST'])
 def add_answer(question):
-    # TODO: add flash message
     answer = Answer(question_id=question.id, answer=request.form['answer'])
     db.session.add(answer)
     db.session.commit()

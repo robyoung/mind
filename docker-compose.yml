@@ -17,6 +17,8 @@ services:
       - DB_DATABASE=mind
       - FLASK_APP=application.py
       - FLASK_DEBUG=1
+      - GOOGLE_ID=
+      - GOOGLE_SECRET=
     volumes:
       - ./:/usr/src/app
   db:
