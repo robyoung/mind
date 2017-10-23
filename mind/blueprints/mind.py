@@ -82,7 +82,11 @@ def show_question(question):
 
 @mind.route('/question/<question>/answer', methods=['POST'])
 def add_answer(question):
-    answer = Answer(question_id=question.id, answer=request.form['answer'])
+    answer = Answer(
+        question_id=question.id,
+        answer=request.form['answer'],
+        email=session.get('user', {}).get('email')
+    )
     db.session.add(answer)
     db.session.commit()
 

@@ -1,5 +1,5 @@
 from mind.app import db
-from mind.models import Question
+from mind.models import Question, Answer
 
 
 def test_list_questions(test_client):
@@ -46,3 +46,19 @@ def test_answer_adds_flash_message(test_client, question):
 
     assert response.status_code == 200
     assert 'Answer added' in response.get_data(as_text=True)
+
+
+def test_answer_question_when_logged_in(flask_app, test_client, question):
+    with test_client.session_transaction() as sess:
+        sess['user'] = {
+            'email': 'example@example.org',
+        }
+
+    response = test_client.post(
+        '/mind/question/test-question/answer',
+        data={'answer': '1'})
+
+    assert response.status_code == 302
+
+    with flask_app.app_context():
+        assert Answer.query.all()[0].email == 'example@example.org'

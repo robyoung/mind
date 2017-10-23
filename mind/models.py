@@ -34,6 +34,7 @@ class Answer(db.Model):
     created_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow
     )
+    email = db.Column(db.String, nullable=True)
 
     question_id = db.Column(db.Integer, db.ForeignKey("question.id"))
 
