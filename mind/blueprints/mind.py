@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, redirect, url_for, request,
-    abort, flash, send_from_directory, session, jsonify
+    abort, flash, send_from_directory, session, jsonify, current_app
 )
 
 from mind.models import Question, Answer
@@ -24,6 +24,13 @@ def info():
 
 @mind.route('/login')
 def login():
+    if current_app.config['ENVIRONMENT'] == 'dev':
+        session['user'] = {
+            'email': 'example@example.org',
+            'given_name': 'Example',
+        }
+        return redirect(url_for('.index')), 302
+
     callback = url_for('.authorized', _external=True, _scheme='https')
     return google.authorize(callback=callback)
 

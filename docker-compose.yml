@@ -11,6 +11,7 @@ services:
     links:
       - db
     environment:
+      - ENVIRONMENT=dev
       - DB_HOST=db
       - DB_USER=mind
       - DB_PASSWORD=mind
