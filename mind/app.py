@@ -4,6 +4,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_oauthlib.client import OAuth
+from werkzeug.contrib.fixers import ProxyFix
 
 
 db = SQLAlchemy()
@@ -24,6 +25,7 @@ google = oauth.remote_app(
 
 def create_app(environment):
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     app.config.update(get_config(environment))
 

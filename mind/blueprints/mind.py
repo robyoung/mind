@@ -14,7 +14,7 @@ def index():
     question_slug = 'how-are-you-today'
     question_url = url_for('.show_question',
                            question=question_slug)
-    return redirect(question_url), 301
+    return redirect(question_url), 302
 
 
 @mind.route('/info')
