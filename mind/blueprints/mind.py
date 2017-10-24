@@ -82,15 +82,22 @@ def add_question():
 
 @mind.route('/question/<question>', methods=['GET'])
 def show_question(question):
-    return render_template('show_question.html', question=question)
+    return render_template(
+        'show_question.html',
+        question=question,
+        user=session.get('user'))
 
 
 @mind.route('/question/<question>/answer', methods=['POST'])
 def add_answer(question):
+    email = session.get('user', {}).get('email')
+    if not email:
+        return 'Not allowed', 403
+
     answer = Answer(
         question_id=question.id,
         answer=request.form['answer'],
-        email=session.get('user', {}).get('email')
+        email=email
     )
     db.session.add(answer)
     db.session.commit()

@@ -9,10 +9,14 @@
 {% endif %}
 {% endwith %}
 
+{% if user %}
 <form id=answer-form method=post action="{{ url_for(".add_answer", question=question) }}">
   <input type=hidden name=answer value="">
 </form>
 {% for n in range(1, 6) %}
 <a data-answer="{{ n }}" class="answer btn-floating btn-large waves-effect waves-light red">{{ n }}</a>
 {% endfor %}
+{% else %}
+<a href="{{ url_for('.login') }}">login to answer</a>
+{% endif %}
 {% endblock %}

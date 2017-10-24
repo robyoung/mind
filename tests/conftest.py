@@ -54,3 +54,15 @@ def question(flask_app):
         db.session.add(question)
         db.session.commit()
     yield question
+
+
+@pytest.fixture
+def user(test_client):
+    user = {
+        'email': 'example@example.org',
+    }
+
+    with test_client.session_transaction() as sess:
+        sess['user'] = user
+
+    return user
