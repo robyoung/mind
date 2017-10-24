@@ -1,6 +1,9 @@
 {% extends "_base.html" %}
 
 {% block main %}
+{% if user %}
+<p>Hi {{ user.given_name }}</p>
+{% endif %}
 <h1>{{ question.title }}</h1>
 
 {% with messages = get_flashed_messages() %}
