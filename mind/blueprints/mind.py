@@ -1,6 +1,6 @@
 from flask import (
     Blueprint, render_template, redirect, url_for, request,
-    abort, flash, send_from_directory, session
+    abort, flash, send_from_directory, session, jsonify
 )
 
 from mind.models import Question, Answer
@@ -15,6 +15,11 @@ def index():
     question_url = url_for('.show_question',
                            question=question_slug)
     return redirect(question_url), 301
+
+
+@mind.route('/info')
+def info():
+    return jsonify(dict(request.headers)), 200
 
 
 @mind.route('/login')
