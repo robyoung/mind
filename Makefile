@@ -2,7 +2,7 @@ COMMIT=$(shell git rev-parse --short HEAD)
 
 .PHONY: run
 run: migrate
-	gunicorn --config gunicorn.conf -b ":8000" application:app
+	gunicorn --config gunicorn.py -b ":8000" application:app
 
 .PHONY: docker-build
 docker-build:
