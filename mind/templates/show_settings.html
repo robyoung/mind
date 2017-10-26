@@ -1,0 +1,19 @@
+{% extends "_base.html" %}
+
+{% block main %}
+<h1>Settings</h1>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<p class="flash">{{ messages[0] }}</p>
+{% endif %}
+{% endwith %}
+
+<form id=settings-form method=post action="{{ url_for('.update_settings') }}">
+  <div class="input-field">
+    <input id=settings-twitter-handle name=twitter_handle type=text value="{{ current_user.user.twitter_handle or '' }}">
+    <label for=settings-twitter-handle>Twitter handle</label>
+  </div>
+  <input type=submit class="btn" value="Update settings">
+</form>
+{% endblock %}

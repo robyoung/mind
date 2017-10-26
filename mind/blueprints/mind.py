@@ -74,6 +74,25 @@ def static(path):
     return send_from_directory('static', path)
 
 
+@mind.route('/settings')
+@login_required
+def show_settings():
+    return render_template('show_settings.html')
+
+
+@mind.route('/settings', methods=['POST'])
+@login_required
+def update_settings():
+    current_user.user.twitter_handle = request.form['twitter_handle']
+    db.session.add(current_user.user)
+    db.session.commit()
+
+    flash('Settings updated')
+
+    return redirect(url_for('.show_settings')), 302
+
+
+# Question related routes
 @mind.route('/question', methods=['GET'])
 def list_questions():
     questions = Question.query.all()
