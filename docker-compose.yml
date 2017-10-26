@@ -18,6 +18,7 @@ services:
       - DB_DATABASE=mind
       - FLASK_APP=application.py
       - FLASK_DEBUG=1
+      - EMAIL_HASH_SALT=example
       - GOOGLE_ID=
       - GOOGLE_SECRET=
     volumes:
