@@ -2,9 +2,10 @@ from flask import (
     Blueprint, render_template, redirect, url_for, request,
     abort, flash, send_from_directory, session, jsonify, current_app
 )
+from flask_login import login_required, current_user
 
-from mind.models import Question, Answer
-from mind.app import db, google
+from mind.models import Question, Answer, User
+from mind.app import db, google, LoginUser
 
 mind = Blueprint('mind', __name__)
 
@@ -19,16 +20,20 @@ def index():
 
 @mind.route('/info')
 def info():
-    return jsonify(dict(request.headers)), 200
+    return jsonify(
+        headers=dict(request.headers),
+        session=dict(session)
+    ), 200
 
 
 @mind.route('/login')
 def login():
     if current_app.config['ENVIRONMENT'] == 'dev':
-        session['user'] = {
+        user = User.get_or_create('example@example.org')
+        LoginUser.login(user, {
             'email': 'example@example.org',
             'given_name': 'Example',
-        }
+        })
         return redirect(url_for('.index')), 302
 
     callback = url_for('.authorized', _external=True, _scheme='https')
@@ -37,7 +42,8 @@ def login():
 
 @mind.route('/logout')
 def logout():
-    session.pop('user', None)
+    session.pop('google_token', None)
+    LoginUser.logout()
     flash('Logged out')
     return redirect(url_for('.index'))
 
@@ -50,19 +56,17 @@ def authorized():
                 'reason={error_reason[0]} ' +
                 'error={error_description[0]}').format(**request.args), 401
 
-    session['user'] = dict(google_token=(resp['access_token'], ''))
+    session['google_token'] = (resp['access_token'], '')
     me = google.get('userinfo')
-    session['user'] = dict(session['user'],
-                           email=me.data['email'],
-                           given_name=me.data['given_name'])
-    session.permanent = True
+    user = User.get_or_create(me.data['email'])
+    LoginUser.login(user, me.data)
 
     return redirect(url_for('.index')), 302
 
 
 @google.tokengetter
 def get_google_oauth_token():
-    return session.get('user', {}).get('google_token')
+    return session.get('google_token')
 
 
 @mind.route('/static/<path:path>')
@@ -74,9 +78,8 @@ def static(path):
 def list_questions():
     questions = Question.query.all()
 
-    return render_template(
-        'list_questions.html',
-        questions=questions)
+    return render_template('list_questions.html',
+                           questions=questions)
 
 
 @mind.route('/question', methods=['POST'])
@@ -89,22 +92,17 @@ def add_question():
 
 @mind.route('/question/<question>', methods=['GET'])
 def show_question(question):
-    return render_template(
-        'show_question.html',
-        question=question,
-        user=session.get('user'))
+    return render_template('show_question.html',
+                           question=question)
 
 
 @mind.route('/question/<question>/answer', methods=['POST'])
+@login_required
 def add_answer(question):
-    email = session.get('user', {}).get('email')
-    if not email:
-        return 'Not allowed', 403
-
     answer = Answer(
         question_id=question.id,
         answer=request.form['answer'],
-        email=email
+        user=current_user.user
     )
     db.session.add(answer)
     db.session.commit()

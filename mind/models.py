@@ -1,10 +1,11 @@
 from datetime import datetime
 import re
-from uuid import uuid4
+import uuid
 
 from sqlalchemy.dialects.postgresql import UUID
 
-from .app import db
+from .database import db
+from .utils import hash_email
 
 
 class Question(db.Model):
@@ -15,7 +16,9 @@ class Question(db.Model):
         db.DateTime, nullable=False, default=datetime.utcnow
     )
 
-    answers = db.relationship("Answer", order_by="desc(Answer.created_at)")
+    answers = db.relationship("Answer",
+                              order_by="desc(Answer.created_at)",
+                              backref="question")
 
     def __repr__(self):
         return "<Question: {}>".format(self.title)
@@ -46,9 +49,24 @@ class Answer(db.Model):
 
 
 class User(db.Model):
-    uuid = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    uuid = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     created_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow)
 
     email_hash = db.Column(db.String, nullable=False, index=True, unique=True)
     twitter_handle = db.Column(db.String, nullable=True)
+
+    answers = db.relationship("Answer", backref="user")
+
+    def __repr__(self):
+        return f"<User: {self.uuid}>"
+
+    @staticmethod
+    def get_or_create(email):
+        email_hash = hash_email(email)
+        user = User.query.filter(User.email_hash == email_hash).first()
+        if user is None:
+            user = User(email_hash=hash_email(email))
+            db.session.add(user)
+            db.session.commit()
+        return user

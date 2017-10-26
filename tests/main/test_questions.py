@@ -32,7 +32,7 @@ def test_question_login_link_instead_of_answer_form_if_not_logged_in(
 
 
 def test_question_answer_form_shown_when_logged_in(
-    test_client, question, user
+    test_client, question, logged_in_user
 ):
     response = test_client.get('/mind/question/test-question')
 
@@ -41,7 +41,7 @@ def test_question_answer_form_shown_when_logged_in(
     assert 'login to answer' not in page_html
 
 
-def test_answer_question(flask_app, test_client, question, user):
+def test_answer_question(flask_app, test_client, question, logged_in_user):
     with flask_app.app_context():
         question = db.session.merge(question)
         assert len(question.answers) == 0
@@ -63,7 +63,7 @@ def test_answer_question_requires_login(flask_app, question):
         '/mind/question/test-question/answer',
         data={'answer': '1'})
 
-    assert response.status_code == 403
+    assert response.status_code == 401
 
     with flask_app.app_context():
         question = db.session.merge(question)
@@ -71,10 +71,12 @@ def test_answer_question_requires_login(flask_app, question):
         assert len(question.answers) == 0
 
 
-def test_answer_adds_flash_message(test_client, question, user):
-    test_client.post(
+def test_answer_adds_flash_message(test_client, question, logged_in_user):
+    response = test_client.post(
         '/mind/question/test-question/answer',
         data={'answer': '1'})
+    assert response.status_code == 302
+
     response = test_client.get('/mind/question/test-question')
 
     assert response.status_code == 200
@@ -82,7 +84,7 @@ def test_answer_adds_flash_message(test_client, question, user):
 
 
 def test_answer_question_when_logged_in(
-    flask_app, test_client, question, user
+    flask_app, test_client, question, logged_in_user
 ):
     response = test_client.post(
         '/mind/question/test-question/answer',
@@ -91,4 +93,6 @@ def test_answer_question_when_logged_in(
     assert response.status_code == 302
 
     with flask_app.app_context():
-        assert Answer.query.all()[0].email == 'example@example.org'
+        answers = Answer.query.all()
+        assert len(answers) == 1
+        assert answers[0].user_uuid == logged_in_user

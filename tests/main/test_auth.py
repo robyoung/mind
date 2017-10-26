@@ -24,7 +24,8 @@ def test_authorisation_failure(mock_google, test_client):
     assert resp.status_code == 401
     assert 'Access denied: reason=bad error=badbad' == \
         resp.get_data(as_text=True)
-    assert 'user' not in session
+    assert 'google_token' not in session
+    assert 'user_info' not in session
     assert not mock_google.get.called
 
 
@@ -39,8 +40,8 @@ def test_authorisation(mock_google, test_client):
     resp = test_client.get('/mind/oauth2-callback')
 
     assert resp.status_code == 302
-    assert session['user'] == {
-        'google_token': ('access-token', ''),
+    assert session['google_token'] == ('access-token', '')
+    assert session['user_info'] == {
         'email': 'email@example.org',
         'given_name': 'Example',
     }
@@ -50,10 +51,12 @@ def test_authorisation(mock_google, test_client):
 @patch('mind.blueprints.mind.google')
 def test_logout(mock_google, test_client):
     with test_client.session_transaction() as sess:
-        sess['user'] = 'irrelevant'
+        sess['google_token'] = 'irrelevant'
+        sess['user_info'] = 'irrelevant'
 
     resp = test_client.get('/mind/logout')
 
     assert resp.status_code == 302
     assert resp.location == 'http://localhost/mind'
-    assert 'user' not in session
+    assert 'google_token' not in session
+    assert 'user_info' not in session

@@ -1,13 +1,16 @@
 import os
+import uuid
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, session
+from flask_login import LoginManager, UserMixin, login_user, logout_user
 from flask_migrate import Migrate
 from flask_oauthlib.client import OAuth
 from werkzeug.contrib.fixers import ProxyFix
 
+from .database import db
+from .models import User
 
-db = SQLAlchemy()
+
 oauth = OAuth()
 google = oauth.remote_app(
     'google',
@@ -21,6 +24,7 @@ google = oauth.remote_app(
     authorize_url='https://accounts.google.com/o/oauth2/auth',
     app_key='GOOGLE',
 )
+login_manager = LoginManager()
 
 
 def create_app(environment):
@@ -33,6 +37,7 @@ def create_app(environment):
     app.migrate = Migrate(app, db)
 
     oauth.init_app(app)
+    login_manager.init_app(app)
 
     from .blueprints.mind import mind as mind_blueprint
     app.register_blueprint(mind_blueprint, url_prefix='/mind')
@@ -58,6 +63,8 @@ def get_config(environment):
         # OAuth
         "GOOGLE_CONSUMER_KEY": os.environ.get("GOOGLE_ID"),
         "GOOGLE_CONSUMER_SECRET": os.environ.get("GOOGLE_SECRET"),
+
+        "EMAIL_HASH_SALT": os.environ["EMAIL_HASH_SALT"],
     }
 
     if environment == "test":
@@ -78,3 +85,51 @@ def _sqlalchemy_uri(dialect, username, password, host, port, database):
         username=username, password=password,
         host=host, port=port,
         database=database)
+
+
+@login_manager.user_loader
+def load_user(user_uuid):
+    return LoginUser.get(user_uuid)
+
+
+class LoginUser(UserMixin):
+    def __init__(self, user):
+        self._user = user
+
+    @staticmethod
+    def login(user, info):
+        session['user_info'] = {
+            k: v for k, v in info.items()
+            if k in ['email', 'given_name']
+        }
+        session.permanent = True
+        login_user(LoginUser(user))
+
+    @staticmethod
+    def logout():
+        logout_user()
+        session.pop('user_info', None)
+
+    @staticmethod
+    def get(user_uuid):
+        try:
+            user = User.query.get(uuid.UUID(user_uuid))
+            if user:
+                return LoginUser(user)
+        except ValueError:
+            pass
+
+    def get_id(self):
+        return str(self._user.uuid)
+
+    @property
+    def given_name(self):
+        return session['user_info']['given_name']
+
+    @property
+    def email(self):
+        return session['user_info']['email']
+
+    @property
+    def user(self):
+        return self._user

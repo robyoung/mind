@@ -2,8 +2,8 @@ import pytest
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import sqlalchemy
 
-from mind.app import create_app, db, get_config
-from mind.models import Question
+from mind.app import create_app, db, get_config, LoginUser
+from mind.models import Question, User
 
 
 @pytest.fixture(scope='session')
@@ -53,16 +53,24 @@ def question(flask_app):
         question = Question(title='Test question')
         db.session.add(question)
         db.session.commit()
-    yield question
+    return question
 
 
 @pytest.fixture
-def user(test_client):
-    user = {
-        'email': 'example@example.org',
-    }
+def logged_in_user(flask_app, test_client, user_uuid):
+    @flask_app.route('/test-login')
+    def login_user():
+        nonlocal user_uuid
+        user = User.query.get(user_uuid)
+        LoginUser.login(user, {
+            'email': 'example@example.org', 'given_name': 'example'
+        })
+        return 'ok'
+    test_client.get('/test-login')
+    return user_uuid
 
-    with test_client.session_transaction() as sess:
-        sess['user'] = user
 
-    return user
+@pytest.fixture
+def user_uuid(flask_app):
+    with flask_app.app_context():
+        return User.get_or_create('example@example.org').uuid

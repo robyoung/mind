@@ -1,8 +1,8 @@
 {% extends "_base.html" %}
 
 {% block main %}
-{% if user %}
-<p>Hi {{ user.given_name }}</p>
+{% if current_user.is_authenticated %}
+<p>Hi {{ current_user.given_name }}</p>
 {% endif %}
 <h1>{{ question.title }}</h1>
 
@@ -12,7 +12,7 @@
 {% endif %}
 {% endwith %}
 
-{% if user %}
+{% if current_user.is_authenticated %}
 <form id=answer-form method=post action="{{ url_for(".add_answer", question=question) }}">
   <input type=hidden name=answer value="">
 </form>
