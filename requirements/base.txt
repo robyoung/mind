@@ -3,4 +3,5 @@ Flask-OAuthlib==0.9.4
 Flask-Login==0.4.0
 Flask-Migrate==2.1.1
 Flask-SQLAlchemy==2.3.1
-psycopg2
+psycopg2==2.7.3.1
+python-twitter==3.3

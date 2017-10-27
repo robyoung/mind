@@ -9,6 +9,7 @@ from werkzeug.contrib.fixers import ProxyFix
 
 from .database import db
 from .models import User
+from .twitter import TwitterClient
 
 
 oauth = OAuth()
@@ -25,6 +26,7 @@ google = oauth.remote_app(
     app_key='GOOGLE',
 )
 login_manager = LoginManager()
+twitter_client = TwitterClient()
 
 
 def create_app(environment):
@@ -38,6 +40,7 @@ def create_app(environment):
 
     oauth.init_app(app)
     login_manager.init_app(app)
+    twitter_client.init_app(app)
 
     from .blueprints.mind import mind as mind_blueprint
     app.register_blueprint(mind_blueprint, url_prefix='/mind')
@@ -63,6 +66,11 @@ def get_config(environment):
         # OAuth
         "GOOGLE_CONSUMER_KEY": os.environ.get("GOOGLE_ID"),
         "GOOGLE_CONSUMER_SECRET": os.environ.get("GOOGLE_SECRET"),
+
+        "TWITTER_CONSUMER_KEY": os.environ.get("TWITTER_CONSUMER_KEY"),
+        "TWITTER_CONSUMER_SECRET": os.environ.get("TWITTER_CONSUMER_SECRET"),
+        "TWITTER_ACCESS_TOKEN": os.environ.get("TWITTER_ACCESS_TOKEN"),
+        "TWITTER_ACCESS_TOKEN_SECRET": os.environ.get("TWITTER_ACCESS_TOKEN_SECRET"),  # noqa: E501
 
         "EMAIL_HASH_SALT": os.environ["EMAIL_HASH_SALT"],
     }

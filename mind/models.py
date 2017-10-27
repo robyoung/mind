@@ -24,7 +24,6 @@ class Question(db.Model):
         return "<Question: {}>".format(self.title)
 
 
-# TODO: add tests around this
 RE_SLUG_REPLACE = re.compile(r'[^\w\-]+')
 
 
@@ -53,6 +52,9 @@ class User(db.Model):
     created_at = db.Column(
         db.DateTime, nullable=False, default=datetime.utcnow)
 
+    latest_answer_created_at = db.Column(
+        db.DateTime, nullable=True)
+
     email_hash = db.Column(db.String, nullable=False, index=True, unique=True)
     twitter_handle = db.Column(db.String, nullable=True)
 
@@ -70,3 +72,14 @@ class User(db.Model):
             db.session.add(user)
             db.session.commit()
         return user
+
+
+@db.event.listens_for(Answer, "after_insert")
+def update_user_latest_answer_created_at(mapper, connection, target):
+    print("Ever in here")
+    user_table = User.__table__
+    connection.execute(
+        user_table.update().
+        where(user_table.c.uuid == target.user.uuid).
+        values(latest_answer_created_at=datetime.utcnow())
+    )
