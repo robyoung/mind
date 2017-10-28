@@ -1,0 +1,26 @@
+<nav class="teal lighten-2" role="navigation">
+  <div class="nav-wrapper container">
+    <a href="{{ home|default(url_for('.index')) }}">Home</a>
+
+    <ul class="right hide-on-med-and-down">
+      <li><a href="{{ url_for('.list_questions') }}">Questions</a></li>
+      {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('.show_settings') }}">Settings</a></li>
+      <li><a href="{{ url_for('.logout') }}">Log out</a></li>
+      {% else %}
+      <li><a href="{{ url_for('.login') }}">Log in</a></li>
+      {% endif %}
+    </ul>
+
+    <ul id="nav-mobile" class="side-nav">
+      <li><a href="{{ url_for('.list_questions') }}">Questions</a></li>
+      {% if current_user.is_authenticated %}
+      <li><a href="{{ url_for('.show_settings') }}">Settings</a></li>
+      <li><a href="{{ url_for('.logout') }}">Log out</a></li>
+      {% else %}
+      <li><a href="{{ url_for('.login') }}">Log in</a></li>
+      {% endif %}
+    </ul>
+    <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+  </div>
+</nav>
