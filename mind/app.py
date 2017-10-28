@@ -64,8 +64,8 @@ def get_config(environment):
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
 
         # OAuth
-        "GOOGLE_CONSUMER_KEY": os.environ.get("GOOGLE_ID"),
-        "GOOGLE_CONSUMER_SECRET": os.environ.get("GOOGLE_SECRET"),
+        "GOOGLE_CONSUMER_KEY": os.environ.get("GOOGLE_CONSUMER_KEY"),
+        "GOOGLE_CONSUMER_SECRET": os.environ.get("GOOGLE_CONSUMER_SECRET"),
 
         "TWITTER_CONSUMER_KEY": os.environ.get("TWITTER_CONSUMER_KEY"),
         "TWITTER_CONSUMER_SECRET": os.environ.get("TWITTER_CONSUMER_SECRET"),
