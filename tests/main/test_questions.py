@@ -93,6 +93,7 @@ def test_answer_question_when_logged_in(
     assert response.status_code == 302
 
     with flask_app.app_context():
+        logged_in_user = db.session.merge(logged_in_user)
         answers = Answer.query.all()
         assert len(answers) == 1
-        assert answers[0].user_uuid == logged_in_user
+        assert answers[0].user == logged_in_user

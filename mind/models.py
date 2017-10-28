@@ -76,10 +76,9 @@ class User(db.Model):
 
 @db.event.listens_for(Answer, "after_insert")
 def update_user_latest_answer_created_at(mapper, connection, target):
-    print("Ever in here")
     user_table = User.__table__
     connection.execute(
         user_table.update().
         where(user_table.c.uuid == target.user.uuid).
-        values(latest_answer_created_at=datetime.utcnow())
+        values(latest_answer_created_at=target.created_at)
     )

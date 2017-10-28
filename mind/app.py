@@ -43,7 +43,9 @@ def create_app(environment):
     twitter_client.init_app(app)
 
     from .blueprints.mind import mind as mind_blueprint
+    from .blueprints.api import api as api_blueprint
     app.register_blueprint(mind_blueprint, url_prefix='/mind')
+    app.register_blueprint(api_blueprint, url_prefix='/api')
 
     app.add_url_rule('/', view_func=lambda: 'OK')
 

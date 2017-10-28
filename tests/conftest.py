@@ -57,20 +57,31 @@ def question(flask_app):
 
 
 @pytest.fixture
-def logged_in_user(flask_app, test_client, user_uuid):
+def logged_in_user(flask_app, test_client, user):
     @flask_app.route('/test-login')
     def login_user():
-        nonlocal user_uuid
-        user = User.query.get(user_uuid)
+        nonlocal user
+        user = db.session.merge(user)
         LoginUser.login(user, {
             'email': 'example@example.org', 'given_name': 'example'
         })
         return 'ok'
     test_client.get('/test-login')
-    return user_uuid
+    return user
 
 
 @pytest.fixture
-def user_uuid(flask_app):
+def user(flask_app):
     with flask_app.app_context():
-        return User.get_or_create('example@example.org').uuid
+        return User.get_or_create('example@example.org')
+
+
+@pytest.fixture
+def user_with_twitter(flask_app, user):
+    with flask_app.app_context():
+        user = db.session.merge(user)
+        User.query \
+            .filter_by(uuid=user.uuid) \
+            .update({'twitter_handle': 'example'})
+        db.session.commit()
+    return user
