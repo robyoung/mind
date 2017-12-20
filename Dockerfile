@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["run.sh"]
+CMD ["./run.sh"]
