@@ -13,12 +13,15 @@
 {% endwith %}
 
 {% if current_user.is_authenticated %}
-<form id=answer-form method=post action="{{ url_for(".add_answer", question=question) }}">
-  <input type=hidden name=answer value="">
-</form>
-{% for n in range(1, 6) %}
-<a data-answer="{{ n }}" class="answer btn-floating btn-large waves-effect waves-light teal">{{ n }}</a>
-{% endfor %}
+<p>
+  <form id=answer-form method=post action="{{ url_for(".add_answer", question=question) }}">
+    <input type=hidden name=answer value="">
+  </form>
+  {% for n in range(1, 6) %}
+  <a data-answer="{{ n }}" class="answer btn-floating btn-large waves-effect waves-light teal">{{ n }}</a>
+  {% endfor %}
+</p>
+<a href="{{ url_for('.show_question_stats', question=question) }}">show stats</a>
 {% else %}
 <a href="{{ url_for('.login') }}">login to answer</a>
 {% endif %}

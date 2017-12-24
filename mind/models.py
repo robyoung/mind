@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import re
 import uuid
 
@@ -19,6 +19,31 @@ class Question(db.Model):
     answers = db.relationship("Answer",
                               order_by="desc(Answer.created_at)",
                               backref="question")
+
+    def stats_for_user(self, user):
+        def dates(start, end):
+            while start <= end:
+                yield start
+                start += timedelta(days=1)
+
+        end_date = date.today()
+        start_date = end_date - timedelta(days=60)
+
+        answers = Answer.query \
+            .filter_by(user=user, question=self) \
+            .filter(Answer.created_at >= start_date) \
+            .order_by(Answer.created_at)
+
+        # TODO @robyoung average answers rather than clobber
+        date_stats = {
+            answer.created_at.date(): int(answer.answer)
+            for answer in answers
+        }
+
+        return [
+            (d, date_stats.get(d, None))
+            for d in dates(start_date, end_date)
+        ]
 
     def __repr__(self):
         return "<Question: {}>".format(self.title)

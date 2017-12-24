@@ -1,0 +1,48 @@
+{% extends "_base.html" %}
+
+{% block main %}
+  <canvas id="myChart" width="400" height="200"></canvas>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+  <script src="{{ url_for('mind.static', path='js/Chart.min.js') }}"></script>
+  <script>
+    var timeFormat = 'MM/DD/YYYY';
+    var ctx = document.getElementById("myChart");
+    var myChart = new Chart(ctx, {
+				type: 'bar',
+						data: {
+                labels: [
+                  {% for key, _ in stats %}
+                    "{{ key.strftime('%Y-%m-%d') }}",
+                  {% endfor %}
+                  ],
+								datasets: [{
+                  data: [
+                    {% for _, value in stats %}
+                    {{ value or 'null' }},
+                    {% endfor %}
+                  ],
+										borderWidth: 1
+								}]
+						},
+						options: {
+								scales: {
+                    xAxes: [{
+                      type: "time",
+                      time: {
+                        unit: 'day'
+                      },
+                      scaleLabel: {
+                        display: true,
+                        labelString: "Date"
+                      }
+                    }],
+										yAxes: [{
+												ticks: {
+														beginAtZero:true
+												}
+										}]
+								}
+						}
+				});
+  </script>
+{% endblock %}

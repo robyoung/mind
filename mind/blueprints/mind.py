@@ -130,6 +130,22 @@ def add_answer(question):
     return redirect(url_for('.show_question', question=question))
 
 
+def rangerer(start, end, step):
+    while start <= end:
+        yield start
+        start += step
+
+
+@mind.route('/question/<question>/stats', methods=['GET'])
+@login_required
+def show_question_stats(question):
+    user = current_user.user
+
+    return render_template('show_question_stats.html',
+                           question=question,
+                           stats=question.stats_for_user(user))
+
+
 MODEL_URL_MAP = {
     'question': Question
 }
