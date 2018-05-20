@@ -52,29 +52,42 @@ def create_app(environment):
     return app
 
 
+def load_config(name, default=None):
+    file_key = f'{name}_FILE'
+    if file_key in os.environ:
+        with open(os.environ[file_key], 'r') as f:
+            return f.read().strip()
+    elif name in os.environ:
+        return os.environ[name]
+    elif default is not None:
+        return default
+    else:
+        raise KeyError(f'{name} not found')
+
+
 def get_config(environment):
     environment = environment.lower()
     assert environment in ["dev", "test", "prod"]
 
     config = {
         "ENVIRONMENT": environment,
-        "SECRET_KEY": os.environ.get("SECRET_KEY", "a big bad secret"),
+        "SECRET_KEY": load_config("SECRET_KEY", "a big bad secret"),
         "DB_HOST": os.environ.get("DB_HOST", "db"),
         "DB_USER": os.environ.get("DB_USER", "mind"),
-        "DB_PASSWORD": os.environ.get("DB_PASSWORD", "mind"),
+        "DB_PASSWORD": load_config('DB_PASSWORD', 'mind'),
         "DB_DATABASE": os.environ.get("DB_DATABASE", "mind"),
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
 
         # OAuth
-        "GOOGLE_CONSUMER_KEY": os.environ.get("GOOGLE_CONSUMER_KEY"),
-        "GOOGLE_CONSUMER_SECRET": os.environ.get("GOOGLE_CONSUMER_SECRET"),
+        "GOOGLE_CONSUMER_KEY": load_config("GOOGLE_CONSUMER_KEY", ""),
+        "GOOGLE_CONSUMER_SECRET": load_config("GOOGLE_CONSUMER_SECRET", ""),
 
-        "TWITTER_CONSUMER_KEY": os.environ.get("TWITTER_CONSUMER_KEY"),
-        "TWITTER_CONSUMER_SECRET": os.environ.get("TWITTER_CONSUMER_SECRET"),
-        "TWITTER_ACCESS_TOKEN": os.environ.get("TWITTER_ACCESS_TOKEN"),
-        "TWITTER_ACCESS_TOKEN_SECRET": os.environ.get("TWITTER_ACCESS_TOKEN_SECRET"),  # noqa: E501
+        "TWITTER_CONSUMER_KEY": load_config("TWITTER_CONSUMER_KEY", ""),
+        "TWITTER_CONSUMER_SECRET": load_config("TWITTER_CONSUMER_SECRET", ""),
+        "TWITTER_ACCESS_TOKEN": load_config("TWITTER_ACCESS_TOKEN", ""),
+        "TWITTER_ACCESS_TOKEN_SECRET": load_config("TWITTER_ACCESS_TOKEN_SECRET", ""),  # noqa: E501
 
-        "EMAIL_HASH_SALT": os.environ["EMAIL_HASH_SALT"],
+        "EMAIL_HASH_SALT": load_config("EMAIL_HASH_SALT"),
     }
 
     if environment == "test":
